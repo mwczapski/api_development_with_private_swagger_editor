@@ -1,0 +1,15 @@
+# disallow what's below
+15*.sh
+*.lnk
+*.url
+Downloads
+*.zip
+*.tar.gz
+*.7z
+~*
+_*
+node_modules
+stubs_nodejs
+
+# allow anything that starts with __env
+!__env*
