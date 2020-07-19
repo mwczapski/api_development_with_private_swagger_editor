@@ -9,24 +9,9 @@
 ## By default, the name of the container will be the same 
 ## as the name of the host directory from which the script is invoked. 
 ## 
-## No validaiton is performed on that name so make sure 
-## that it does not ocntaine spaces ro special characters
+## No validation is performed on that name so make sure 
+## that it does not contain spaces or special characters
 ## Stick to letters, number and underscores.
-## 
-## Container run command is configured to instruct Docker
-## to remove the container when it is stopped. 
-## Since no changes are expected to be made to the resources
-## inside the container which are not shared from the Host 
-## (like the /api shared directory which is in reality a Host directory
-## to which container has access), removing and re-creating 
-## the container as needed will have no side effects.
-## 
-## The following command will create the container with 
-## the Container name as given by the CONTAINER_NAME command line variable -> "aa"
-## the host listening port as given by the HOST_LISTEN_PORT command line variable -> "2345"
-##
-## CONTAINER_NAME=aa HOST_LISTEN_PORT=2345 ./scripts/initialize_editing_environment.sh
-## 
 ## 
 ## --------------------------------
 ## The MIT License (MIT)
@@ -75,26 +60,39 @@ ynResp="${ynResp:-N}"
   exit;
 }
 
-# make sure the container is not already in existence (whether running or stopped)
-#
-docker container ls -a | grep "${CONTAINER_NAME}" 2>/dev/null 1>/dev/null && {
-  echo "Aborting script execution - Docker Container '${CONTAINER_NAME}' already exists and is runnning"
-  exit;
-}
 
 # create shared directories
 #
 SHARED_API_DIR_HOST_WSL="${dir_name}/api"
+mkdir -pv ${SHARED_API_DIR_HOST_WSL}
 
 # convert to DOSish version for windows docker
 #
 SHARED_API_DIR_HOST_DOSISH=${SHARED_API_DIR_HOST_WSL//\/\\}
 SHARED_API_DIR_HOST_DOSISH=${SHARED_API_DIR_HOST_DOSISH//\/mnt\//}
 SHARED_API_DIR_HOST_DOSISH="${SHARED_API_DIR_HOST_DOSISH:0:1}:${SHARED_API_DIR_HOST_DOSISH:1}"
+IMAGE_VERSION="1.0.0"
+IMAGE_NAME="mwczapski/swagger_editor"
+CONTAINER_HOSTNAME="${CONTAINER_NAME}"
+CONTAINER_VOLUME_MAPPING="-v ${SHARED_API_DIR_HOST_DOSISH}:/api"
+CONTAINER_MAPPED_PORTS="-p 127.0.0.1:${HOST_LISTEN_PORT}:3001/tcp"
 
-# echo ${SHARED_API_DIR_HOST_DOSISH}
 
-mkdir -pv ${SHARED_API_DIR_HOST_WSL}
+cat <<-EOF > ./scripts/environment_configuration.variables
+#!/usr/bin/env bash
+
+SHARED_API_DIR_HOST_WSL="${SHARED_API_DIR_HOST_WSL}"
+SHARED_API_DIR_HOST_DOSISH="${SHARED_API_DIR_HOST_DOSISH}"
+IMAGE_VERSION="${IMAGE_VERSION}"
+IMAGE_NAME="${IMAGE_NAME}"
+CONTAINER_NAME="${CONTAINER_NAME}"
+CONTAINER_HOSTNAME="${CONTAINER_NAME}"
+CONTAINER_VOLUME_MAPPING="${CONTAINER_VOLUME_MAPPING}"
+CONTAINER_MAPPED_PORTS="${CONTAINER_MAPPED_PORTS}"
+HOST_LISTEN_PORT=${HOST_LISTEN_PORT}
+
+EOF
+
 
 # create initial openapi.yaml if it does not already exist
 #
@@ -139,46 +137,6 @@ components:
           type: string
 EOF
 
-# create and start Swagger Editor Docker Container
-#
-IMAGE_VERSION="1.0.0"
-IMAGE_NAME="mwczapski/swagger_editor"
-CONTAINER_HOSTNAME="${CONTAINER_NAME}"
-CONTAINER_VOLUME_MAPPING=" -v ${SHARED_API_DIR_HOST_DOSISH}:/api"
-CONTAINER_MAPPED_PORTS=" -p 127.0.0.1:${HOST_LISTEN_PORT}:3001/tcp "
-
-docker.exe run \
-    --name ${CONTAINER_NAME} \
-    --hostname ${CONTAINER_HOSTNAME} \
-    ${CONTAINER_VOLUME_MAPPING} \
-    ${CONTAINER_MAPPED_PORTS} \
-    --detach \
-    --interactive \
-    --rm \
-    --tty \
-        ${IMAGE_NAME}:${IMAGE_VERSION}
-
-docker container ls | grep "${CONTAINER_NAME}" 1>/dev/null || {
-  echo "Failed to create container '${CONTAINER_NAME}' - please investigate the reasons"
-  exit;
-}
-
-
-# update Host listening port in index.html in the container, if necessary
-#
-[[ "${HOST_LISTEN_PORT}" != "3001" ]] && docker exec -it "${CONTAINER_NAME}" sed -i "s|localhost:3001|localhost:${HOST_LISTEN_PORT}|" /swagger_tools/swagger-editor/index.html
-
-# notify about container creation
-#
-docker container ls | grep "${CONTAINER_NAME}" 1>/dev/null && {
-  echo
-  echo "----------------------------------------------------------"
-  echo "Container '${CONTAINER_NAME}' created"
-} || {
-  echo "Failed to update container '${CONTAINER_NAME}' - please investigate"
-  exit;
-}
-
 # create 'run shell in the container' script
 #
 cat <<-EOF > ./scripts/shell_in_container.sh
@@ -221,19 +179,17 @@ cmd.exe /c "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" -new-wi
 EOF
 chmod u+x ./scripts/swagger_editor_in_chrome_on_host.sh
 
+echo "Created environment configuration script: ./scripts/environment_configuration.variables"
+echo 
+cat ./scripts/environment_configuration.variables
 echo
-echo "Host URL to run the Swagger Editor is 'http://localhost:${HOST_LISTEN_PORT}'"
+echo "Utility scripts:"
 echo
-echo "To run the Swagger Editor in a Host's Chrome Web Browser, execute from the WSL Terminal window:"
-echo " ./scripts/swagger_editor_in_chrome_on_host.sh"
+
+ls -c1 ./scripts/*.sh
+
 echo
-echo "To run the Swagger Editor in a Host's default Web Browser, execute from the WSL Terminal window:"
-echo " ./scripts/swagger_editor_in_browser_on_host.sh"
-echo
-echo "To access container's shell, execute from the WSL Terminal window:"
-echo " ./scripts/shell_in_container.sh"
-echo
-echo "To stop and remove the container, execute from the WSL Terminal window:"
-echo " docker container stop ${CONTAINER_NAME}"
-echo "----------------------------------------------------------"
-echo
+echo "To create and start the container execute the following script in WSL2 Terminal window:"
+echo " ./scripts/start_editing_container.sh"
+echo 
+echo "----------------------------------------------------------------"
