@@ -19,14 +19,14 @@ The following environment elements are required:
 
 ## Assumptions
 
-Scripts provided in this package make certain assumptions about the environment in which they operate. 
+Scripts provided in this package make certain assumptions about the environment in which they operate.
 
 These are:
 
 1. Pre-requisites are met.
-2. The Host provides Docker with the location of the Host directory which it mounts (as a bound volume) in the container to enable sharing of the `openapi.yaml` file between the Host and the Container. This is not strictly necessary just for editing openapi specifications as local files can be edited without the Swagger Editor having to access the api specification from inside its container. The environment is configured this way to enable a Swagger Codegen Container to access the same openapi.yaml to generate stub servers for API testing. 
+2. The Host provides Docker with the location of the Host directory which it mounts (as a bound volume) in the container to enable sharing of the `openapi.yaml` file between the Host and the Container. This is not strictly necessary just for editing openapi specifications as local files can be edited without the Swagger Editor having to access the api specification from inside its container. The environment is configured this way to enable a Swagger Codegen Container to access the same openapi.yaml to generate stub servers for API testing.
 3. Scripts are executed from WSL2 Bash shell.
-4. Web Browser which hosts the Swagger Editor UI  runs from the Windows Host, i.e. is a browser on Windows.
+4. Web Browser which hosts the Swagger Editor UI runs from the Windows Host, i.e. is a browser on Windows.
 
 Once the container is created and starts it can be managed from the Windows command line, however little management will be required.
 
@@ -42,7 +42,7 @@ Windows 10 `firefox` browser, when requested to save YAML file, saves it to its 
 
 ## Create Swagger Editor Environment Configuration Script
 
-Create a Docker host directory for the project, let's say `/mnt/d/test_swagger_editor` , and clone to it the github repository  [api_development_with_private_swagger_editor](https://github.com/mwczapski/api_development_with_private_swagger_editor) to get the shell scripts and documentation. 
+Create a Docker host directory for the project, let's say `/mnt/d/test_swagger_editor` , and clone to it the github repository [api_development_with_private_swagger_editor](https://github.com/mwczapski/api_development_with_private_swagger_editor) to get the shell scripts and documentation.
 
 The project directory name, in this example `test_swagger_editor`, will be offered as the name of the container to be created. This can be overridden with the environment variable `CONTAINER_NAME`, which must be set before the script is executed.
 
@@ -50,7 +50,7 @@ The script assumes that the Host port `3101` will be mapped to container's port 
 
 If default container name and host listen port are fine then environment variables need not be set.
 
-``` shell
+```shell
 mkdir -pv /mnt/d/test_swagger_editor
 cd /mnt/d/test_swagger_editor
 
@@ -60,16 +60,16 @@ git clone git@github.com:mwczapski/api_development_with_private_swagger_editor.g
 
 Execute the `initialize_editing_environment.sh` script, setting CONTAINER_NAME and HOST_LISTEN_PORT environment variables if and as required. The command below shows how environment variables can be set before script execution. Since the values ar the same as defaults this is purely for illustration and changes nothing.
 
-``` 
+```
 cd /mnt/d/test_swagger_editor
-CONTAINER_NAME=test_swagger_editor HOST_LISTEN_PORT=3101 ./scripts/initialize_editing_environment.sh 
+CONTAINER_NAME=test_swagger_editor HOST_LISTEN_PORT=3101 ./scripts/initialize_editing_environment.sh
 ```
 
 The script will display what it thinks are the correct values, based on the current working directory and the environment variables (if any). It will then request the user to confirm the values and if the response is Y (or any variant startng with lowercase or uppercase Y, like y Yes YES Yeah) it will create the environment configuration variables script used used by other scripts.
 
 Here is the transcript of a session:
 
-``` shell
+```shell
 All project artefacts will be created in directory hierarchy starting with 'test_swagger_editor'
 Docker Container Name will be 'test_swagger_editor'
 Host URL to access the Swagger Editor will be 'http://localhost:3101'
@@ -110,15 +110,15 @@ To create and start the container execute the following script in WSL2 Terminal 
 
 Execute the following:
 
-``` shell
+```shell
 cd /mnt/d/test_swagger_editor
 ./scripts/start_editing_container.sh
- 
+
 ```
 
 The script will start the container and display potentially useful information, see following transcript. Once the Docker Inage is downloaded by the script the first time it is executed, starting the container takes less than a second on my machine.
 
-``` shell
+```shell
 83130a4f6a77979036706c8c5419eb0923276cf7ac62379019700bad81bf6884
 
 ----------------------------------------------------------
@@ -146,13 +146,13 @@ Make sure the container is started.
 
 Use one of the provided shell scripts from the WSL2 terminal window:
 
-``` shell
+```shell
 ./scripts/swagger_editor_in_chrome_on_host.sh
 ```
 
 or
 
-``` shell
+```shell
 ./scripts/swagger_editor_in_browser_on_host.sh
 ```
 
@@ -160,43 +160,43 @@ or start your favourite web browser on the Host and enter the URL: `http://local
 
 The browser will show rhe page with two panes - editor pane on the left and explore/test pane on the right.
 
-![]img/main_swagger_editir_window.png)
+![](img/main_swagger_editir_window.png)
 
 Make some trivial change in one of the description sections, for example:
 
-![]img/minor_change.png)
+![](img/minor_change.png)
 
 Pull down the "**File**" menu and choose "**Save as YAML**"
 
-![]img/save_as_yaml.png)
+![](img/save_as_yaml.png)
 
 Navigate to the correct Host directory, choose the name of the file to overwrite and "**Save**"
 
-![]img/choose_file_and_save.png)
+![](img/choose_file_and_save.png)
 
 Open the `openapi.yaml` file just saved using an external editor on Windows, for example `Notepad`.
 
-``` shell 
+```shell
 notepad.exe d:\test_swagger_editor\api\openapi.yaml
 ```
 
 Make a trivial change and save the file.
 
-![]img/notepad_edit.png)
+![](img/notepad_edit.png)
 
 Refresh the Swagger Editor browser window and ee the change.
 
-![]img/changed_in_swagger_editor.png)
+![](img/changed_in_swagger_editor.png)
 
 Make a mistake and see what Swagger Editor has to say:
 
-![]img/error_in_swagger_editor.png)
+![](img/error_in_swagger_editor.png)
 
 Correct the error, save, close the browser.
 
 Inspect the file in the file system.
 
-``` shell
+```shell
 cat ./api/openapi.yaml
 openapi: "3.0.1"
 info:
@@ -243,7 +243,7 @@ That's it.
 
 The environment is configured in such a way that the `openapi.yaml` file is persisted to the Host storage so that if the contianer is deleted, which it is by default when it is stopped, `openapi.yaml` and all other files in the `api` directory shared between the Host and the Container will be preserved and will be accessible when the container is started next time.
 
-``` shell
+```shell
 cd /mnt/d/test_swagger_editor
 ./scripts/stop_and_delete_editing_container.sh
 ```
