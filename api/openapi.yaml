@@ -1,0 +1,37 @@
+openapi: "3.0.1"
+info:
+  title: Weather API
+  description: |
+    This API is a __test__ API for validation of local swagger editor
+    deployment and configuration
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:3103/'
+tags:
+  - name: Weather
+    description: Weather, and so on 1234
+paths:
+  /weather:
+    get:
+      tags:
+        - Weather
+      description: |
+        This endpoint will tell whether weather is __good__ or _bad_.
+      operationId: status
+      responses:
+        '200':
+          description: Good weather
+          content: {}
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/response_500'
+components:
+  schemas:
+    response_500:
+      type: object
+      properties:
+        message:
+          type: string
