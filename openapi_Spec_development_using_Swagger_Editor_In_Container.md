@@ -6,7 +6,7 @@ It is possible to develop locally-hosted openapi Specifications using the on-lin
 
 It is also possible, and quite easy, to stand up a locally-hosted Swagger Editor, and eliminate the need to be on-line for this work.
 
-This document describes the resources needed to create a locally-hosted Swagger Editor as a Docker Container, and describes rthe workflow, with illustrations. The github repository [api_development_with_private_swagger_editor](https://github.com/mwczapski/api_development_with_private_swagger_editor) includes this document and the shell scripts described herein.
+This document describes the resources needed to create a locally-hosted Swagger Editor as a Docker Container, and describes the workflow, with illustrations. The github repository [api_development_with_private_swagger_editor](https://github.com/mwczapski/api_development_with_private_swagger_editor) includes this document and the shell scripts described herein.
 
 ## Pre-requisites
 
@@ -35,8 +35,6 @@ Once the container is created and starts it can be managed from the Windows comm
 The name of the API Spec file is pre-configured as `openapi.yaml`. This is what the Swagger Edior Server expects in the shared `api` directory and what it will serve when first shown in the web browser. A Host file with any name can be edited. Pull down the "**File**" menu, click "**Import file**", locate the file and select it. Swagger Editor will happily open the file and let us edit it and save it back to the original location. The container is configured this way to allow transparent generation of stub server code if using the Swagger Editor container in conjunction with the Swagger Codegen container. More on that in another article.
 
 ## Notes
-
-The name of the API Spec file is pre-configured as `openapi.yaml`. This is what the Swagger Edior Server expects in the shared `api` directory and what it will serve when first shown in the web browser. A Host file with any name can be edited. Pull down the "**File**" menu, click "**Import file**", locate the file and select it. Swagger Editor will happily open the file and let us edit it and save it back to the original location. The container is configured this way to allow transparent generation of stub server code if using the Swagger Editor container in conjunction with the Swagger Codegen container. More on that in another article.
 
 Windows 10 `firefox` browser, when requested to save YAML file, saves it to its configured "downloads" directory, unless instructed to do otherwise through settings. To make it more useable for editing YAML files in various Host directories, check that Settings-->Downloads "Always ask you where to save files" is checked. If not, you will need to go to the default downloads directory and copy the edited file to where it is supposed to go.
 
@@ -67,7 +65,7 @@ cd /mnt/d/test_swagger_editor
 CONTAINER_NAME=test_swagger_editor HOST_LISTEN_PORT=3101 ./scripts/initialize_editing_environment.sh 
 ```
 
-The script will display what it thinks are the correct values, based on the current working directory and the environment variables (if any). It will then request the user to confirm the values and if the response is Y (or any variant like y Yes YES Yeah) it will create the environment configuration variables script used used by other scripts.
+The script will display what it thinks are the correct values, based on the current working directory and the environment variables (if any). It will then request the user to confirm the values and if the response is Y (or any variant startng with lowercase or uppercase Y, like y Yes YES Yeah) it will create the environment configuration variables script used used by other scripts.
 
 Here is the transcript of a session:
 
@@ -162,19 +160,19 @@ or start your favourite web browser on the Host and enter the URL: `http://local
 
 The browser will show rhe page with two panes - editor pane on the left and explore/test pane on the right.
 
-![](D:\github_materials\swagger_codegen\UseCases\develop_openapi_spec_from_host\img\main_swagger_editir_window.png)
+![]img/main_swagger_editir_window.png)
 
 Make some trivial change in one of the description sections, for example:
 
-![](D:\github_materials\swagger_codegen\UseCases\develop_openapi_spec_from_host\img\minor_change.png)
+![]img/minor_change.png)
 
 Pull down the "**File**" menu and choose "**Save as YAML**"
 
-![](D:\github_materials\swagger_codegen\UseCases\develop_openapi_spec_from_host\img\save_as_yaml.png)
+![]img/save_as_yaml.png)
 
 Navigate to the correct Host directory, choose the name of the file to overwrite and "**Save**"
 
-![](D:\github_materials\swagger_codegen\UseCases\develop_openapi_spec_from_host\img\choose_file_and_save.png)
+![]img/choose_file_and_save.png)
 
 Open the `openapi.yaml` file just saved using an external editor on Windows, for example `Notepad`.
 
@@ -184,15 +182,15 @@ notepad.exe d:\test_swagger_editor\api\openapi.yaml
 
 Make a trivial change and save the file.
 
-![](D:\github_materials\swagger_codegen\UseCases\develop_openapi_spec_from_host\img\notepad_edit.png)
+![]img/notepad_edit.png)
 
 Refresh the Swagger Editor browser window and ee the change.
 
-![](D:\github_materials\swagger_codegen\UseCases\develop_openapi_spec_from_host\img\changed_in_swagger_editor.png)
+![]img/changed_in_swagger_editor.png)
 
 Make a mistake and see what Swagger Editor has to say:
 
-![](D:\github_materials\swagger_codegen\UseCases\develop_openapi_spec_from_host\img\error_in_swagger_editor.png)
+![]img/error_in_swagger_editor.png)
 
 Correct the error, save, close the browser.
 
@@ -275,6 +273,3 @@ The MIT License (MIT)
 Copyright © 2020 Michael Czapski
 
 Rights to Docker (and related), Git (and related), Debian, its packages and libraries, and 3rd party packages and libraries, belong to their respective owners.
-
-
-
