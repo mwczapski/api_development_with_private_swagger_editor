@@ -184,7 +184,7 @@ Make a trivial change and save the file.
 
 ![](img/notepad_edit.png)
 
-Refresh the Swagger Editor browser window and ee the change.
+Refresh the Swagger Editor browser window and see the change.
 
 ![](img/changed_in_swagger_editor.png)
 
